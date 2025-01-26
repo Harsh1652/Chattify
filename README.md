@@ -67,14 +67,6 @@ spring.datasource.password=
 
 
 
-# Customization
-
-- **Repository URL**: Replace `https://github.com/harsh1652/Chattify.git` with the actual URL of your GitHub repository.
-- **Technologies**: Adjust the technologies section based on what you actually used in your project.
-- **Configuration**: Add any additional configuration options that are relevant to your application.
-- **License**: If you are using a different license, update the license section accordingly.
-
-Feel free to modify this template to better fit your project's specifics!
 
 
 
