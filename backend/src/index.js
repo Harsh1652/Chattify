@@ -25,7 +25,9 @@ app.use(cors({
 app.use("/api/auth", authRoutes);
 app.use("/api/message", messageRoutes);
 
-
+// Increase the request size limit to 10MB (adjust as needed)
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 // Start the server
 app.listen(PORT, () => {
