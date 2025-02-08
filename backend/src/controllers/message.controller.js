@@ -2,18 +2,22 @@ import cloudinary from "../lib/cloudinary.js";
 import Message from "../models/message.models.js";
 import User from "../models/user.model.js";
 
-export const getUsersForSidebar = async(req, res) => {
+export const getUsersForSidebar = async (req, res) => {
     try {
-        const loggedInUserId = req.User._id;
-        const filteredUsers = await User.find({_id: {$ne:loggedInUserId}}).select("-password");
+        if (!req.user || !req.user._id) {
+            return res.status(401).json({ message: "Unauthorized: No user found in request." });
+        }
 
-        res.status(200).json(filteredUsers)
+        const loggedInUserId = req.user._id;  
+        const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select("-password");
+
+        res.status(200).json(filteredUsers);
     } catch (error) {
-        console.error("Error in getUsersForSidebar: ", error.message);
-        res.status(500).json({error: "Internal Server error"});
-
+        console.error("Error in getUsersForSidebar:", error.message);
+        res.status(500).json({ error: "Internal Server Error" });
     }
-}
+};
+
 
 
 export const getMessages = async(req,res) => {
@@ -35,19 +39,19 @@ export const getMessages = async(req,res) => {
 }
 
 
-export const sendMessage = async(req, res) => {
+export const sendMessage = async (req, res) => {
     try {
-        const {text, image} = req.body;
-        const {id: receiverId} = req.params;
+        const { text, image } = req.body;
+        const { id: receiverId } = req.params;
         const senderId = req.user._id;
 
         let imageUrl;
-        if(image){
+        if (image) {
             const uploadResponse = await cloudinary.uploader.upload(image);
             imageUrl = uploadResponse.secure_url;
         }
 
-        const newMessage = newMessage({
+        const newMessage = new Message({  // ✅ Corrected
             senderId,
             receiverId,
             text,
@@ -56,13 +60,9 @@ export const sendMessage = async(req, res) => {
 
         await newMessage.save();
 
-        //todo: realtime functionality
-
         res.status(201).json(newMessage);
-
     } catch (error) {
-        
-        console.error("Error in getMessages Controller: ", error.message);
-        res.status(500).json({error: "Internal Server error"});
+        console.error("Error in sendMessage Controller:", error.message);
+        res.status(500).json({ error: "Internal Server Error" });
     }
-}
+};
