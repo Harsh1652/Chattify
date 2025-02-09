@@ -1,3 +1,4 @@
+//ChatContainer.jsx
 import { useChatStore } from "../store/useChatStore";
 import { useEffect, useRef } from "react";
 import ChatHeader from "./ChatHeader";
@@ -12,22 +13,21 @@ const ChatContainer = () => {
     getMessages,
     isMessagesLoading,
     selectedUser,
-    // subscribeToMessages,
-    // unsubscribeFromMessages,
-  } = useChatStore();
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  } = useChatStore();  // ✅ Ensure `subscribeToMessages` is included
+
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
 
   useEffect(() => {
-    if (!selectedUser) return; // ✅ Prevents crash if no user is selected
+    if (!selectedUser) return;  // ✅ Prevents crash if no user is selected
     getMessages(selectedUser._id);
 
-    // subscribeToMessages();
+    subscribeToMessages();
 
-    return () => {
-      // unsubscribeFromMessages();
-    };
-  }, [selectedUser?._id, getMessages]); // ✅ Safe access with `?.`
+    return () => unsubscribeFromMessages();
+  }, [selectedUser?._id, getMessages, subscribeToMessages, unsubscribeFromMessages]); // ✅ Safe usage
 
   useEffect(() => {
     if (messageEndRef.current && messages) {
@@ -56,14 +56,12 @@ const ChatContainer = () => {
             className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}
             ref={messageEndRef}
           >
-            <div className=" chat-image avatar">
+            <div className="chat-image avatar">
               <div className="size-10 rounded-full border">
                 <img
-                  src={
-                    message.senderId === authUser._id
-                      ? authUser.profilePic || "/avatar.png"
-                      : selectedUser?.profilePic || "/avatar.png" // ✅ Safe access with `?.`
-                  }
+                  src={message.senderId === authUser._id
+                    ? authUser.profilePic || "/avatar.png"
+                    : selectedUser?.profilePic || "/avatar.png"}  // ✅ Safe access with `?.`
                   alt="profile pic"
                 />
               </div>
